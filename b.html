@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat avec Gemini</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        min-width: 400px;
+        font-family: Arial, sans-serif;
+      }
+
+      .box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 12px;
+        justify-content: center;
+      }
+
+      #search {
+        width: 76vw;
+        padding: 8px;
+        font-size: 16px;
+      }
+
+      #send {
+        padding: 8px 16px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      #contenue {
+        background-color: rgb(8, 57, 57);
+        height: 330px;
+        width: 380px;
+        border-radius: 26px;
+        padding: 9px;
+        margin-top: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #contenue img {
+        height: 250px;
+        width: 350px;
+        border-radius: 12px;
+        object-fit: cover;
+      }
+
+      #contenue audio {
+        margin-top: 8px;
+        width: 90%;
+      }
+
+      #footer {
+        position: fixed;
+        background-color: blueviolet;
+        height: 100px;
+        width: 100%;
+        bottom: 0;
+        z-index: 10;
+      }
+
+      #resultats {
+        margin-bottom: 120px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <input type="text" placeholder="Écrivez votre requête" id="search" />
+      <button id="send">Envoyer</button>
+    </div>
+
+    <div id="resultats" class="box"></div>
+
+    <div id="footer"></div>
+
+    <script>
+      const send = document.getElementById("send");
+      const search = document.getElementById("search");
+      const resultats = document.getElementById("resultats");
+
+      send.addEventListener("click", () => {
+        fetch(`http://localhost:200?valeur=${encodeURIComponent(search.value)}`)
+          .then((e) => e.json())
+          .then((data) => {
+            resultats.innerHTML = "";
+
+            for (let d of data.data) {
+              const contenaire = document.createElement("div");
+              contenaire.id = "contenue";
+
+              const img = document.createElement("img");
+              img.src = d.album.cover_xl;
+              contenaire.appendChild(img);
+
+              const audio = document.createElement("audio");
+              audio.src = d.preview;
+              audio.controls = true;
+              audio.volume = 0.5;
+              contenaire.appendChild(audio);
+
+              resultats.appendChild(contenaire);
+            }
+          })
+          .catch((err) => {
+            console.error("Erreur lors de la récupération des données :", err);
+          });
+      });
+    </script>
+  </body>
+</html>
